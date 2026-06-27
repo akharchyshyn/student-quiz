@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { shuffle, buildOrder } from './shuffle';
-import type { LoadedQuiz } from './types';
+import type { Question } from './types';
 
 // детерминированный ГПСЧ для воспроизводимых тестов
 function seeded(seed: number): () => number {
@@ -29,19 +29,16 @@ describe('shuffle', () => {
 });
 
 describe('buildOrder', () => {
-  const quiz: LoadedQuiz = {
-    version: 'v1', title: 'T',
-    questions: [
-      { id: 'q1', type: 'single', text: '', options: [{ id: 'a', text: '' }, { id: 'b', text: '' }], correct: ['a'] },
-      { id: 'q2', type: 'multi', text: '', options: [{ id: 'a', text: '' }, { id: 'b', text: '' }, { id: 'c', text: '' }], correct: ['a'] },
-    ],
-  };
+  const questions: Question[] = [
+    { id: 'q1', type: 'single', text: '', options: [{ id: 'a', text: '' }, { id: 'b', text: '' }], correct: ['a'] },
+    { id: 'q2', type: 'multi', text: '', options: [{ id: 'a', text: '' }, { id: 'b', text: '' }, { id: 'c', text: '' }], correct: ['a'] },
+  ];
   it('порядок вопросов — перестановка всех id', () => {
-    const order = buildOrder(quiz, seeded(3));
+    const order = buildOrder(questions, seeded(3));
     expect([...order.questions].sort()).toEqual(['q1', 'q2']);
   });
   it('для каждого вопроса порядок опций — перестановка его id', () => {
-    const order = buildOrder(quiz, seeded(3));
+    const order = buildOrder(questions, seeded(3));
     expect([...order.options.q1].sort()).toEqual(['a', 'b']);
     expect([...order.options.q2].sort()).toEqual(['a', 'b', 'c']);
   });

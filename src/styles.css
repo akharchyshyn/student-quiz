@@ -8,6 +8,9 @@ h1 { font-size: 1.5rem; } h2 { font-size: 1.2rem; line-height: 1.35; }
 .btn.primary { background: var(--primary); color:#fff; }
 .btn.primary:disabled { opacity:.45; cursor:not-allowed; }
 .btn.ghost { background:transparent; color: var(--muted); border:1px solid var(--line); }
+.menu { display:flex; flex-direction:column; gap:10px; margin:12px 0; }
+.btn.test { display:flex; justify-content:space-between; align-items:center; gap:12px; text-align:left; background:#fff; color:var(--fg); border:1px solid var(--line); }
+.tname { margin:0 0 4px; font-size:.9rem; }
 .opts { display:flex; flex-direction:column; gap:10px; margin-top:16px; }
 .opt { display:flex; gap:12px; align-items:flex-start; padding:14px; border:1px solid var(--line);
   border-radius:12px; background:#fff; cursor:pointer; }

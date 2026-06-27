@@ -1,80 +1,76 @@
 import { loadQuiz } from '../core/loader';
 import { grade } from '../core/grader';
-import { createProgressStore, reconcile, type ProgressStore } from '../core/progress';
-import type { LoadedQuiz, Progress } from '../core/types';
 import { buildOrder } from '../core/shuffle';
-import { renderHome, renderQuestion, renderResult, renderMessage, renderAllQuestions } from './screens';
+import type { LoadedQuiz, Test, QuizOrder } from '../core/types';
+import { renderMenu, renderQuestion, renderResult, renderMessage, renderAllQuestions } from './screens';
 
-export async function mountApp(root: HTMLElement, store: ProgressStore = createProgressStore()): Promise<void> {
+/** Состояние одного прохождения теста — только в памяти, без сохранения. */
+interface Run { test: Test; order: QuizOrder; answers: Record<string, string[]>; index: number; }
+
+export async function mountApp(root: HTMLElement): Promise<void> {
   let quiz: LoadedQuiz;
   try {
     quiz = await loadQuiz();
   } catch (e) {
-    root.innerHTML = renderMessage('Ошибка загрузки', (e as Error).message);
+    root.innerHTML = renderMessage('Помилка завантаження', (e as Error).message);
     return;
   }
-  if (quiz.questions.length === 0) {
-    root.innerHTML = renderMessage('Тестов пока нет', 'База тестов пуста.');
+  if (quiz.tests.length === 0) {
+    root.innerHTML = renderMessage('Тестів поки немає', 'База тестів порожня.');
     return;
   }
 
-  const byId = new Map(quiz.questions.map((q) => [q.id, q] as const));
-  const ensureOrder = (p: Progress): Progress => {
-    if (!p.order || p.order.questions.length !== quiz.questions.length) {
-      p.order = buildOrder(quiz);
-      store.save(p);
-    }
-    return p;
-  };
-
-  const home = () => {
-    root.innerHTML = renderHome(quiz, reconcile(store, quiz.version));
-    root.querySelector('[data-action="start"]')?.addEventListener('click', () => showQuestion(store.start(quiz.version, buildOrder(quiz))));
-    root.querySelector('[data-action="continue"]')?.addEventListener('click', () => showQuestion(ensureOrder(reconcile(store, quiz.version)!)));
-    root.querySelector('[data-action="reset"]')?.addEventListener('click', () => { store.clear(); home(); });
+  const menu = () => {
+    root.innerHTML = renderMenu(quiz);
+    root.querySelectorAll<HTMLElement>('[data-test]').forEach((b) => {
+      b.addEventListener('click', () => {
+        const test = quiz.tests.find((t) => t.id === b.dataset.test);
+        if (test) startTest(test);
+      });
+    });
     root.querySelector('[data-action="all"]')?.addEventListener('click', () => showAll());
   };
 
-  const showAll = () => {
-    root.innerHTML = renderAllQuestions(quiz);
-    root.querySelectorAll('[data-action="home"]').forEach((b) => b.addEventListener('click', () => home()));
+  const startTest = (test: Test) => {
+    showQuestion({ test, order: buildOrder(test.questions), answers: {}, index: 0 });
   };
 
-  const showQuestion = (p: Progress) => {
-    ensureOrder(p);
-    if (p.index >= quiz.questions.length) return showResult(p);
-    const qid = p.order.questions[p.index];
-    const base = byId.get(qid)!;
-    const orderedOptions = p.order.options[qid].map((id) => base.options.find((o) => o.id === id)!);
+  const showQuestion = (run: Run) => {
+    if (run.index >= run.test.questions.length) return showResult(run);
+    const qid = run.order.questions[run.index];
+    const base = run.test.questions.find((q) => q.id === qid)!;
+    const orderedOptions = run.order.options[qid].map((id) => base.options.find((o) => o.id === id)!);
     const q = { ...base, options: orderedOptions };
-    root.innerHTML = renderQuestion(quiz, q, p);
-    const selected = new Set(p.answers[q.id] ?? []);
+    root.innerHTML = renderQuestion(quiz, run.test, q, run.index, run.answers[q.id] ?? []);
+
+    const selected = new Set(run.answers[q.id] ?? []);
     const nextBtn = root.querySelector<HTMLButtonElement>('[data-action="next"]')!;
     root.querySelectorAll<HTMLInputElement>('input[name="opt"]').forEach((input) => {
       input.addEventListener('change', () => {
         if (q.type === 'single') { selected.clear(); selected.add(input.value); }
         else if (input.checked) selected.add(input.value);
         else selected.delete(input.value);
-        p.answers[q.id] = [...selected];
-        store.save(p);
+        run.answers[q.id] = [...selected];
         nextBtn.disabled = selected.size === 0;
       });
     });
     root.querySelector('[data-action="prev"]')?.addEventListener('click', () => {
-      p.index = Math.max(0, p.index - 1); store.save(p); showQuestion(p);
+      run.index = Math.max(0, run.index - 1); showQuestion(run);
     });
-    root.querySelector('[data-action="abort"]')?.addEventListener('click', () => { store.clear(); home(); });
-    nextBtn.addEventListener('click', () => {
-      p.index += 1; store.save(p);
-      if (p.index >= quiz.questions.length) showResult(p); else showQuestion(p);
-    });
+    root.querySelector('[data-action="abort"]')?.addEventListener('click', () => menu());
+    nextBtn.addEventListener('click', () => { run.index += 1; showQuestion(run); });
   };
 
-  const showResult = (p: Progress) => {
-    p.finishedAt = new Date().toISOString(); store.save(p);
-    root.innerHTML = renderResult(grade(quiz, p.answers));
-    root.querySelector('[data-action="restart"]')?.addEventListener('click', () => { store.clear(); home(); });
+  const showResult = (run: Run) => {
+    root.innerHTML = renderResult(run.test, grade(run.test.questions, run.answers));
+    root.querySelectorAll('[data-action="menu"]').forEach((b) => b.addEventListener('click', () => menu()));
+    root.querySelector('[data-action="retry"]')?.addEventListener('click', () => startTest(run.test));
   };
 
-  home();
+  const showAll = () => {
+    root.innerHTML = renderAllQuestions(quiz);
+    root.querySelectorAll('[data-action="menu"]').forEach((b) => b.addEventListener('click', () => menu()));
+  };
+
+  menu();
 }

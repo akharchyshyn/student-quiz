@@ -49,7 +49,8 @@ describe('parseTest', () => {
 describe('buildQuiz', () => {
   it('склеивает вопросы в порядке manifest', () => {
     const quiz = buildQuiz({ version: 'v1', title: 'T', tests: ['t.json'] }, [parseTest(validTest)]);
-    expect(quiz.questions.map((q) => q.id)).toEqual(['q1', 'q2']);
+    expect(quiz.tests).toHaveLength(1);
+    expect(quiz.tests[0].questions.map((q) => q.id)).toEqual(['q1', 'q2']);
     expect(quiz.version).toBe('v1');
   });
   it('падает на дубликате id вопроса между тестами', () => {

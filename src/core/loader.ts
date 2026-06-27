@@ -56,16 +56,14 @@ export function parseTest(raw: unknown): Test {
 }
 
 export function buildQuiz(manifest: Manifest, tests: Test[]): LoadedQuiz {
-  const questions: Question[] = [];
   const seen = new Set<string>();
   for (const t of tests) {
     for (const q of t.questions) {
       if (seen.has(q.id)) throw new Error(`Дубликат id вопроса "${q.id}" (тест ${t.id})`);
       seen.add(q.id);
-      questions.push(q);
     }
   }
-  return { version: manifest.version, title: manifest.title, debug: manifest.debug, questions };
+  return { version: manifest.version, title: manifest.title, debug: manifest.debug, tests };
 }
 
 async function fetchJson(url: string): Promise<unknown> {

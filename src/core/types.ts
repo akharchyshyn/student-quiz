@@ -14,22 +14,13 @@ export interface Test { id: string; title: string; questions: Question[]; }
 
 export interface Manifest { version: string; title: string; tests: string[]; debug?: boolean; }
 
-/** Все вопросы из активных тестов, склеенные в порядке manifest. */
-export interface LoadedQuiz { version: string; title: string; questions: Question[]; debug?: boolean; }
+/** Загруженная база: тесты хранятся раздельно (для меню тем). */
+export interface LoadedQuiz { version: string; title: string; tests: Test[]; debug?: boolean; }
 
-/** Зафиксированный на попытку перемешанный порядок вопросов и опций. */
+/** Перемешанный на прохождение порядок вопросов и опций одного теста. */
 export interface QuizOrder {
   questions: string[];
   options: Record<string, string[]>;
-}
-
-export interface Progress {
-  version: string;
-  answers: Record<string, string[]>;
-  index: number;
-  startedAt: string;
-  finishedAt: string | null;
-  order: QuizOrder;
 }
 
 export interface QuestionResult { question: Question; selected: string[]; correct: boolean; }

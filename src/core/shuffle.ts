@@ -1,4 +1,4 @@
-import type { LoadedQuiz, QuizOrder } from './types';
+import type { Question, QuizOrder } from './types';
 
 /** Перемешивание Фишера–Йетса. Не мутирует вход. rnd по умолчанию Math.random. */
 export function shuffle<T>(arr: readonly T[], rnd: () => number = Math.random): T[] {
@@ -10,10 +10,10 @@ export function shuffle<T>(arr: readonly T[], rnd: () => number = Math.random): 
   return a;
 }
 
-/** Строит перемешанный порядок вопросов и опций для одной попытки. */
-export function buildOrder(quiz: LoadedQuiz, rnd: () => number = Math.random): QuizOrder {
-  const questions = shuffle(quiz.questions.map((q) => q.id), rnd);
+/** Строит перемешанный порядок вопросов и опций для одного теста. */
+export function buildOrder(questions: Question[], rnd: () => number = Math.random): QuizOrder {
+  const order = shuffle(questions.map((q) => q.id), rnd);
   const options: Record<string, string[]> = {};
-  for (const q of quiz.questions) options[q.id] = shuffle(q.options.map((o) => o.id), rnd);
-  return { questions, options };
+  for (const q of questions) options[q.id] = shuffle(q.options.map((o) => o.id), rnd);
+  return { questions: order, options };
 }
