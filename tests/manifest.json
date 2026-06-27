@@ -1,5 +1,5 @@
 {
-  "version": "v1.0",
+  "version": "v1.1",
   "title": "Підготовка КОРД",
   "debug": false,
   "tests": [
@@ -12,6 +12,7 @@
     "test-07.json",
     "test-08.json",
     "test-09.json",
-    "test-10.json"
+    "test-10.json",
+    "test-11.json"
   ]
 }
