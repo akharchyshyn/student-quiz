@@ -1,0 +1,5 @@
+{
+  "version": "poc-1",
+  "title": "Демо-тест",
+  "tests": ["test-01.json"]
+}
