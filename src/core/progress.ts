@@ -1,4 +1,4 @@
-import type { Progress } from './types';
+import type { Progress, QuizOrder } from './types';
 
 const KEY = 'student-quiz:progress';
 
@@ -6,7 +6,7 @@ export interface ProgressStore {
   load(): Progress | null;
   save(p: Progress): void;
   clear(): void;
-  start(version: string): Progress;
+  start(version: string, order: QuizOrder): Progress;
 }
 
 export function createProgressStore(storage: Storage = localStorage): ProgressStore {
@@ -18,8 +18,8 @@ export function createProgressStore(storage: Storage = localStorage): ProgressSt
     },
     save(p) { storage.setItem(KEY, JSON.stringify(p)); },
     clear() { storage.removeItem(KEY); },
-    start(version) {
-      const p: Progress = { version, answers: {}, index: 0, startedAt: new Date().toISOString(), finishedAt: null };
+    start(version, order) {
+      const p: Progress = { version, answers: {}, index: 0, startedAt: new Date().toISOString(), finishedAt: null, order };
       storage.setItem(KEY, JSON.stringify(p));
       return p;
     },

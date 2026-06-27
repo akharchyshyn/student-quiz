@@ -13,23 +13,25 @@ function fakeStorage(): Storage {
   };
 }
 
+const ORDER = { questions: [], options: {} };
+
 describe('progress store', () => {
   it('start создаёт чистый прогресс и сохраняет его', () => {
     const s = createProgressStore(fakeStorage());
-    const p = s.start('v1');
+    const p = s.start('v1', ORDER);
     expect(p.version).toBe('v1');
     expect(p.index).toBe(0);
     expect(s.load()).toEqual(p);
   });
   it('save/load цикл', () => {
     const s = createProgressStore(fakeStorage());
-    const p = s.start('v1');
+    const p = s.start('v1', ORDER);
     p.index = 3; p.answers.q1 = ['a']; s.save(p);
     expect(s.load()!.index).toBe(3);
   });
   it('clear удаляет прогресс', () => {
     const s = createProgressStore(fakeStorage());
-    s.start('v1'); s.clear();
+    s.start('v1', ORDER); s.clear();
     expect(s.load()).toBeNull();
   });
   it('битый JSON в хранилище → load возвращает null', () => {
@@ -42,12 +44,12 @@ describe('progress store', () => {
 describe('reconcile', () => {
   it('возвращает прогресс при совпадении версии', () => {
     const s = createProgressStore(fakeStorage());
-    s.start('v1');
+    s.start('v1', ORDER);
     expect(reconcile(s, 'v1')).not.toBeNull();
   });
   it('чистит прогресс при смене версии и возвращает null', () => {
     const s = createProgressStore(fakeStorage());
-    s.start('v1');
+    s.start('v1', ORDER);
     expect(reconcile(s, 'v2')).toBeNull();
     expect(s.load()).toBeNull();
   });

@@ -1,5 +1,5 @@
 {
-  "version": "mvp-2",
+  "version": "mvp-3",
   "title": "Підготовка КОРД",
   "tests": ["test-01.json", "test-02.json", "test-03.json", "test-04.json"]
 }
