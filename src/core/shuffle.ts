@@ -10,10 +10,17 @@ export function shuffle<T>(arr: readonly T[], rnd: () => number = Math.random): 
   return a;
 }
 
-/** Строит перемешанный порядок вопросов и опций для одного теста. */
+/** id выбираемых элементов вопроса (которые показываются и перемешиваются). */
+function choiceIds(q: Question): string[] {
+  if (q.type === 'order') return (q.items ?? []).map((it) => it.id);
+  if (q.type === 'match') return (q.right ?? []).map((r) => r.id);
+  return (q.options ?? []).map((o) => o.id);
+}
+
+/** Строит перемешанный порядок вопросов и их элементов для одного теста. */
 export function buildOrder(questions: Question[], rnd: () => number = Math.random): QuizOrder {
   const order = shuffle(questions.map((q) => q.id), rnd);
   const options: Record<string, string[]> = {};
-  for (const q of questions) options[q.id] = shuffle(q.options.map((o) => o.id), rnd);
+  for (const q of questions) options[q.id] = shuffle(choiceIds(q), rnd);
   return { questions: order, options };
 }

@@ -29,20 +29,56 @@ function parseOption(raw: unknown, ctx: string): Option {
   return { id: asString(o.id, `${ctx}.id`), text: asString(o.text, `${ctx}.text`) };
 }
 
+function parseChoices(o: Record<string, unknown>, field: string, ctx: string): Option[] {
+  const list = asArray(o[field], `${ctx}.${field}`).map((op, i) => parseOption(op, `${ctx}.${field}[${i}]`));
+  if (list.length < 2) throw new Error(`${ctx}.${field}: минимум 2 элемента`);
+  if (new Set(list.map((x) => x.id)).size !== list.length) throw new Error(`${ctx}.${field}: повторяющиеся id`);
+  return list;
+}
+
 function parseQuestion(raw: unknown, ctx: string): Question {
   const o = asObject(raw, ctx);
   const id = asString(o.id, `${ctx}.id`);
-  if (o.type !== 'single' && o.type !== 'multi') throw new Error(`${ctx}.type: ожидалось single|multi`);
   const type = o.type;
   const text = asString(o.text, `${ctx}.text`);
-  const options = asArray(o.options, `${ctx}.options`).map((op, i) => parseOption(op, `${ctx}.options[${i}]`));
-  if (options.length < 2) throw new Error(`${ctx}.options: минимум 2 варианта`);
-  const optionIds = new Set(options.map((op) => op.id));
-  const correct = asArray(o.correct, `${ctx}.correct`).map((c, i) => asString(c, `${ctx}.correct[${i}]`));
-  if (correct.length === 0) throw new Error(`${ctx}.correct: нет правильных ответов`);
-  for (const c of correct) if (!optionIds.has(c)) throw new Error(`${ctx}.correct: "${c}" нет среди options`);
-  if (type === 'single' && correct.length !== 1) throw new Error(`${ctx}.correct: single требует ровно 1 ответ`);
-  return { id, type, text, options, correct };
+
+  if (type === 'single' || type === 'multi' || type === 'cloze') {
+    const options = parseChoices(o, 'options', ctx);
+    const ids = new Set(options.map((op) => op.id));
+    const correct = asArray(o.correct, `${ctx}.correct`).map((c, i) => asString(c, `${ctx}.correct[${i}]`));
+    if (correct.length === 0) throw new Error(`${ctx}.correct: нет правильных ответов`);
+    for (const c of correct) if (!ids.has(c)) throw new Error(`${ctx}.correct: "${c}" нет среди options`);
+    if ((type === 'single' || type === 'cloze') && correct.length !== 1) {
+      throw new Error(`${ctx}.correct: ${type} требует ровно 1 ответ`);
+    }
+    return { id, type, text, options, correct };
+  }
+
+  if (type === 'order') {
+    const items = parseChoices(o, 'items', ctx);
+    const ids = new Set(items.map((it) => it.id));
+    const correct = asArray(o.correct, `${ctx}.correct`).map((c, i) => asString(c, `${ctx}.correct[${i}]`));
+    if (correct.length !== items.length) throw new Error(`${ctx}.correct: должен перечислять все items по порядку`);
+    if (new Set(correct).size !== correct.length) throw new Error(`${ctx}.correct: повторяющиеся id`);
+    for (const c of correct) if (!ids.has(c)) throw new Error(`${ctx}.correct: "${c}" нет среди items`);
+    return { id, type, text, items, correct };
+  }
+
+  if (type === 'match') {
+    const left = parseChoices(o, 'left', ctx);
+    const right = parseChoices(o, 'right', ctx);
+    const rightIds = new Set(right.map((r) => r.id));
+    const rawPairs = asObject(o.pairs, `${ctx}.pairs`);
+    const pairs: Record<string, string> = {};
+    for (const l of left) {
+      const r = asString(rawPairs[l.id], `${ctx}.pairs[${l.id}]`);
+      if (!rightIds.has(r)) throw new Error(`${ctx}.pairs[${l.id}]: "${r}" нет среди right`);
+      pairs[l.id] = r;
+    }
+    return { id, type, text, left, right, pairs };
+  }
+
+  throw new Error(`${ctx}.type: ожидалось single|multi|cloze|order|match`);
 }
 
 export function parseTest(raw: unknown): Test {

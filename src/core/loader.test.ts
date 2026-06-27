@@ -59,3 +59,28 @@ describe('buildQuiz', () => {
     expect(() => buildQuiz({ version: 'v1', title: 'T', tests: ['a', 'b'] }, [a, b])).toThrow(/Дубликат/);
   });
 });
+
+describe('parseQuestion — новые типы', () => {
+  const wrap = (q: unknown) => ({ id: 't', title: 'T', questions: [q] });
+
+  it('order: валиден, если correct перечисляет все items', () => {
+    const q = { id: 'o1', type: 'order', text: 'Порядок?', items: [{ id: 's1', text: 'A' }, { id: 's2', text: 'B' }], correct: ['s1', 's2'] };
+    expect(parseTest(wrap(q)).questions[0].type).toBe('order');
+  });
+  it('order: падает, если correct не покрывает все items', () => {
+    const q = { id: 'o1', type: 'order', text: 'Порядок?', items: [{ id: 's1', text: 'A' }, { id: 's2', text: 'B' }], correct: ['s1'] };
+    expect(() => parseTest(wrap(q))).toThrow();
+  });
+  it('cloze: требует ровно 1 correct', () => {
+    const q = { id: 'c1', type: 'cloze', text: '___', options: [{ id: 'a', text: 'x' }, { id: 'b', text: 'y' }], correct: ['a', 'b'] };
+    expect(() => parseTest(wrap(q))).toThrow(/cloze/);
+  });
+  it('match: валиден при полном pairs', () => {
+    const q = { id: 'm1', type: 'match', text: 'Зіставте', left: [{ id: 'l1', text: 'A' }, { id: 'l2', text: 'B' }], right: [{ id: 'r1', text: '1' }, { id: 'r2', text: '2' }], pairs: { l1: 'r1', l2: 'r2' } };
+    expect(parseTest(wrap(q)).questions[0].type).toBe('match');
+  });
+  it('match: падает, если pair указывает на неизвестный right', () => {
+    const q = { id: 'm1', type: 'match', text: 'Зіставте', left: [{ id: 'l1', text: 'A' }, { id: 'l2', text: 'B' }], right: [{ id: 'r1', text: '1' }, { id: 'r2', text: '2' }], pairs: { l1: 'r1', l2: 'rX' } };
+    expect(() => parseTest(wrap(q))).toThrow();
+  });
+});

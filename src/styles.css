@@ -11,6 +11,17 @@ h1 { font-size: 1.5rem; } h2 { font-size: 1.2rem; line-height: 1.35; }
 .menu { display:flex; flex-direction:column; gap:10px; margin:12px 0; }
 .btn.test { display:flex; justify-content:space-between; align-items:center; gap:12px; text-align:left; background:#fff; color:var(--fg); border:1px solid var(--line); }
 .tname { margin:0 0 4px; font-size:.9rem; }
+.order { list-style:none; padding:0; counter-reset:ord; margin:16px 0; }
+.order li { display:flex; align-items:center; gap:10px; padding:12px 14px; margin-bottom:8px; border:1px solid var(--line); border-radius:12px; background:#fff; counter-increment:ord; }
+.order li::before { content:counter(ord); min-width:1.5em; height:1.5em; display:inline-flex; align-items:center; justify-content:center; background:var(--primary); color:#fff; border-radius:50%; font-size:.8rem; flex:none; }
+.order .otext { flex:1; }
+.ordbtns { display:flex; gap:6px; flex:none; }
+.ordbtn { font-size:1rem; padding:4px 12px; border:1px solid var(--line); border-radius:8px; background:#fff; cursor:pointer; }
+.ordbtn:disabled { opacity:.35; }
+.match { display:flex; flex-direction:column; gap:10px; margin:16px 0; }
+.mrow { display:flex; align-items:center; gap:10px; }
+.mleft { flex:1; }
+.match select { padding:10px; border:1px solid var(--line); border-radius:10px; font-size:1rem; background:#fff; max-width:55%; }
 .opts { display:flex; flex-direction:column; gap:10px; margin-top:16px; }
 .opt { display:flex; gap:12px; align-items:flex-start; padding:14px; border:1px solid var(--line);
   border-radius:12px; background:#fff; cursor:pointer; }

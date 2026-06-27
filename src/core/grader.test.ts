@@ -28,3 +28,24 @@ describe('grade', () => {
     expect(res.results[0].selected).toEqual([]);
   });
 });
+
+const cloze: Question = { id: 'c1', type: 'cloze', text: '___', options: [{ id: 'a', text: '' }, { id: 'b', text: '' }], correct: ['a'] };
+const order: Question = { id: 'o1', type: 'order', text: '', items: [{ id: 's1', text: '' }, { id: 's2', text: '' }, { id: 's3', text: '' }], correct: ['s1', 's2', 's3'] };
+const match: Question = { id: 'mt', type: 'match', text: '', left: [{ id: 'l1', text: '' }, { id: 'l2', text: '' }], right: [{ id: 'r1', text: '' }, { id: 'r2', text: '' }], pairs: { l1: 'r1', l2: 'r2' } };
+
+describe('isCorrect — новые типы', () => {
+  it('cloze: как single', () => {
+    expect(isCorrect(cloze, ['a'])).toBe(true);
+    expect(isCorrect(cloze, ['b'])).toBe(false);
+  });
+  it('order: точный порядок', () => {
+    expect(isCorrect(order, ['s1', 's2', 's3'])).toBe(true);
+    expect(isCorrect(order, ['s2', 's1', 's3'])).toBe(false);
+    expect(isCorrect(order, ['s1', 's2'])).toBe(false);
+  });
+  it('match: все пары верны (по порядку left)', () => {
+    expect(isCorrect(match, ['r1', 'r2'])).toBe(true);
+    expect(isCorrect(match, ['r2', 'r1'])).toBe(false);
+    expect(isCorrect(match, ['r1'])).toBe(false);
+  });
+});

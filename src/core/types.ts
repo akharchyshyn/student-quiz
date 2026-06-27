@@ -1,4 +1,4 @@
-export type QuestionType = 'single' | 'multi';
+export type QuestionType = 'single' | 'multi' | 'cloze' | 'order' | 'match';
 
 export interface Option { id: string; text: string; }
 
@@ -6,8 +6,12 @@ export interface Question {
   id: string;
   type: QuestionType;
   text: string;
-  options: Option[];
-  correct: string[];
+  options?: Option[];               // single | multi | cloze
+  correct?: string[];               // single|multi|cloze (id) · order (порядок id)
+  items?: Option[];                 // order — кроки
+  left?: Option[];                  // match — ліва колонка
+  right?: Option[];                 // match — права колонка (варіанти)
+  pairs?: Record<string, string>;   // match — leftId -> rightId
 }
 
 export interface Test { id: string; title: string; questions: Question[]; }
