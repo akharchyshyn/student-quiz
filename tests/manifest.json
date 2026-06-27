@@ -1,5 +1,5 @@
 {
-  "version": "poc-1",
-  "title": "Демо-тест",
-  "tests": ["test-01.json"]
+  "version": "mvp-1",
+  "title": "Підготовка УПО",
+  "tests": ["test-01.json", "test-02.json", "test-03.json"]
 }
