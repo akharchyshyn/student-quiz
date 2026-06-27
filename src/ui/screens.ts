@@ -35,15 +35,16 @@ export function renderQuestion(quiz: LoadedQuiz, q: Question, p: Progress): stri
       <input type="${inputType}" name="opt" value="${esc(o.id)}" ${selected.has(o.id) ? 'checked' : ''} />
       <span>${esc(o.text)}</span>
     </label>`).join('');
+  const debugId = quiz.debug ? ` · <code class="qid">${esc(q.id)}</code>` : '';
   return `<main class="screen">
     <div class="progress"><div class="bar" style="width:${(n / m) * 100}%"></div></div>
-    <p class="counter">${n} / ${m}</p>
-    <h2>${esc(q.text)}</h2>
-    <form class="opts">${opts}</form>
+    <p class="counter">${n} / ${m}${debugId}</p>
     <div class="nav">
       <button class="btn ghost" data-action="prev" ${p.index === 0 ? 'disabled' : ''}>Назад</button>
       <button class="btn primary" data-action="next" ${selected.size === 0 ? 'disabled' : ''}>${n === m ? 'Завершить' : 'Далее'}</button>
     </div>
+    <h2>${esc(q.text)}</h2>
+    <form class="opts">${opts}</form>
   </main>`;
 }
 

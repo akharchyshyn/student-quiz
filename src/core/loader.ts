@@ -19,7 +19,9 @@ export function parseManifest(raw: unknown): Manifest {
   const title = asString(o.title, 'manifest.title');
   const tests = asArray(o.tests, 'manifest.tests').map((t, i) => asString(t, `manifest.tests[${i}]`));
   if (tests.length === 0) throw new Error('manifest.tests: список пуст');
-  return { version, title, tests };
+  const manifest: Manifest = { version, title, tests };
+  if (o.debug === true) manifest.debug = true;
+  return manifest;
 }
 
 function parseOption(raw: unknown, ctx: string): Option {
@@ -63,7 +65,7 @@ export function buildQuiz(manifest: Manifest, tests: Test[]): LoadedQuiz {
       questions.push(q);
     }
   }
-  return { version: manifest.version, title: manifest.title, questions };
+  return { version: manifest.version, title: manifest.title, debug: manifest.debug, questions };
 }
 
 async function fetchJson(url: string): Promise<unknown> {

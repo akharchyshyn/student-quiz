@@ -17,6 +17,7 @@ h1 { font-size: 1.5rem; } h2 { font-size: 1.2rem; line-height: 1.35; }
 .progress { height:6px; background:var(--line); border-radius:3px; overflow:hidden; }
 .progress .bar { height:100%; background:var(--primary); transition:width .2s; }
 .counter { color:var(--muted); margin:8px 0 0; }
+.qid { color:var(--bad); font-weight:600; font-family:ui-monospace, monospace; }
 .score { font-size:2rem; font-weight:700; }
 .review { list-style:none; padding:0; }
 .review li { padding:12px; border-radius:10px; margin-bottom:8px; border:1px solid var(--line); }

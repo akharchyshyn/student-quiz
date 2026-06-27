@@ -17,6 +17,12 @@ describe('parseManifest', () => {
   it('падает на пустом tests', () => {
     expect(() => parseManifest({ version: 'v1', title: 'T', tests: [] })).toThrow();
   });
+  it('читает debug: true', () => {
+    expect(parseManifest({ version: 'v1', title: 'T', tests: ['t.json'], debug: true }).debug).toBe(true);
+  });
+  it('debug відсутній за замовчуванням', () => {
+    expect(parseManifest({ version: 'v1', title: 'T', tests: ['t.json'] }).debug).toBeUndefined();
+  });
 });
 
 describe('parseTest', () => {

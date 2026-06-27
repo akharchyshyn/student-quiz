@@ -12,10 +12,10 @@ export interface Question {
 
 export interface Test { id: string; title: string; questions: Question[]; }
 
-export interface Manifest { version: string; title: string; tests: string[]; }
+export interface Manifest { version: string; title: string; tests: string[]; debug?: boolean; }
 
 /** Все вопросы из активных тестов, склеенные в порядке manifest. */
-export interface LoadedQuiz { version: string; title: string; questions: Question[]; }
+export interface LoadedQuiz { version: string; title: string; questions: Question[]; debug?: boolean; }
 
 /** Зафиксированный на попытку перемешанный порядок вопросов и опций. */
 export interface QuizOrder {
