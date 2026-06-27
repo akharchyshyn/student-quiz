@@ -18,10 +18,14 @@ export function renderHome(quiz: LoadedQuiz, progress: Progress | null): string 
     ? `<button class="btn primary" data-action="continue">Продолжить</button>
        <button class="btn ghost" data-action="reset">Начать заново</button>`
     : `<button class="btn primary" data-action="start">Старт</button>`;
+  const debugBtn = quiz.debug
+    ? '<button class="btn ghost" data-action="all">Все вопросы</button>'
+    : '';
   return `<main class="screen">
     <h1>${esc(quiz.title)}</h1>
     <p>${quiz.questions.length} вопрос(ов)</p>
     ${buttons}
+    ${debugBtn}
   </main>`;
 }
 
@@ -35,10 +39,12 @@ export function renderQuestion(quiz: LoadedQuiz, q: Question, p: Progress): stri
       <input type="${inputType}" name="opt" value="${esc(o.id)}" ${selected.has(o.id) ? 'checked' : ''} />
       <span>${esc(o.text)}</span>
     </label>`).join('');
-  const debugId = quiz.debug ? ` · <code class="qid">${esc(q.id)}</code>` : '';
+  const debugCtl = quiz.debug
+    ? ` · <code class="qid">${esc(q.id)}</code> <button class="dbg" data-action="abort">Сброс</button>`
+    : '';
   return `<main class="screen">
     <div class="progress"><div class="bar" style="width:${(n / m) * 100}%"></div></div>
-    <p class="counter">${n} / ${m}${debugId}</p>
+    <p class="counter">${n} / ${m}${debugCtl}</p>
     <div class="nav">
       <button class="btn ghost" data-action="prev" ${p.index === 0 ? 'disabled' : ''}>Назад</button>
       <button class="btn primary" data-action="next" ${selected.size === 0 ? 'disabled' : ''}>${n === m ? 'Завершить' : 'Далее'}</button>
@@ -64,5 +70,26 @@ export function renderResult(result: GradeResult): string {
     <p class="score">${result.correctCount} / ${result.total}</p>
     <ul class="review">${items}</ul>
     <button class="btn primary" data-action="restart">Пройти заново</button>
+  </main>`;
+}
+
+/** Дебаг-экран: все вопросы з відповідями (правильні позначені), лише для читання. */
+export function renderAllQuestions(quiz: LoadedQuiz): string {
+  const items = quiz.questions.map((q, i) => {
+    const opts = q.options.map((o) => {
+      const ok = q.correct.includes(o.id);
+      return `<li class="${ok ? 'ok' : ''}">${ok ? '✓ ' : ''}${esc(o.text)}</li>`;
+    }).join('');
+    return `<li>
+      <p class="q"><code class="qid">${esc(q.id)}</code> <span class="muted">[${q.type}]</span> ${i + 1}. ${esc(q.text)}</p>
+      <ul class="alllist">${opts}</ul>
+    </li>`;
+  }).join('');
+  const back = '<button class="btn ghost" data-action="home">← На головну</button>';
+  return `<main class="screen">
+    <h1>Усі питання (${quiz.questions.length})</h1>
+    ${back}
+    <ul class="review">${items}</ul>
+    ${back}
   </main>`;
 }

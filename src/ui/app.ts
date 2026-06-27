@@ -3,7 +3,7 @@ import { grade } from '../core/grader';
 import { createProgressStore, reconcile, type ProgressStore } from '../core/progress';
 import type { LoadedQuiz, Progress } from '../core/types';
 import { buildOrder } from '../core/shuffle';
-import { renderHome, renderQuestion, renderResult, renderMessage } from './screens';
+import { renderHome, renderQuestion, renderResult, renderMessage, renderAllQuestions } from './screens';
 
 export async function mountApp(root: HTMLElement, store: ProgressStore = createProgressStore()): Promise<void> {
   let quiz: LoadedQuiz;
@@ -32,6 +32,12 @@ export async function mountApp(root: HTMLElement, store: ProgressStore = createP
     root.querySelector('[data-action="start"]')?.addEventListener('click', () => showQuestion(store.start(quiz.version, buildOrder(quiz))));
     root.querySelector('[data-action="continue"]')?.addEventListener('click', () => showQuestion(ensureOrder(reconcile(store, quiz.version)!)));
     root.querySelector('[data-action="reset"]')?.addEventListener('click', () => { store.clear(); home(); });
+    root.querySelector('[data-action="all"]')?.addEventListener('click', () => showAll());
+  };
+
+  const showAll = () => {
+    root.innerHTML = renderAllQuestions(quiz);
+    root.querySelectorAll('[data-action="home"]').forEach((b) => b.addEventListener('click', () => home()));
   };
 
   const showQuestion = (p: Progress) => {
@@ -57,6 +63,7 @@ export async function mountApp(root: HTMLElement, store: ProgressStore = createP
     root.querySelector('[data-action="prev"]')?.addEventListener('click', () => {
       p.index = Math.max(0, p.index - 1); store.save(p); showQuestion(p);
     });
+    root.querySelector('[data-action="abort"]')?.addEventListener('click', () => { store.clear(); home(); });
     nextBtn.addEventListener('click', () => {
       p.index += 1; store.save(p);
       if (p.index >= quiz.questions.length) showResult(p); else showQuestion(p);
