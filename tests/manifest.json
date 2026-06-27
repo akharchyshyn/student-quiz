@@ -1,6 +1,17 @@
 {
-  "version": "mvp-3",
+  "version": "v1.0",
   "title": "Підготовка КОРД",
   "debug": false,
-  "tests": ["test-01.json", "test-02.json", "test-03.json", "test-04.json"]
+  "tests": [
+    "test-01.json",
+    "test-02.json",
+    "test-03.json",
+    "test-04.json",
+    "test-05.json",
+    "test-06.json",
+    "test-07.json",
+    "test-08.json",
+    "test-09.json",
+    "test-10.json"
+  ]
 }
