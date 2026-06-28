@@ -1,6 +1,6 @@
 import { defineConfig, type Plugin } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, cpSync } from 'node:fs';
 import { join } from 'node:path';
 
 // Dev-only: отдаём базу тестов из верхнеуровневой папки tests/ по пути /tests/*
@@ -22,9 +22,22 @@ function serveTestsDir(): Plugin {
   };
 }
 
+// Build: кладём базу тестов из tests/ в dist/tests/, чтобы сборка была
+// самодостаточной (для статик-хостинга — Cloudflare Pages / Netlify и т.п.).
+function copyTestsToDist(): Plugin {
+  return {
+    name: 'copy-tests-to-dist',
+    apply: 'build',
+    closeBundle() {
+      cpSync('tests', 'dist/tests', { recursive: true });
+    },
+  };
+}
+
 export default defineConfig({
   plugins: [
     serveTestsDir(),
+    copyTestsToDist(),
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
