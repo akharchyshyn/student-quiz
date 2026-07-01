@@ -3,6 +3,8 @@ import { VitePWA } from 'vite-plugin-pwa';
 import { readFileSync, existsSync, cpSync } from 'node:fs';
 import { join } from 'node:path';
 
+import { cloudflare } from "@cloudflare/vite-plugin";
+
 // Dev-only: отдаём базу тестов из верхнеуровневой папки tests/ по пути /tests/*
 function serveTestsDir(): Plugin {
   return {
@@ -35,32 +37,28 @@ function copyTestsToDist(): Plugin {
 }
 
 export default defineConfig({
-  plugins: [
-    serveTestsDir(),
-    copyTestsToDist(),
-    VitePWA({
-      registerType: 'autoUpdate',
-      manifest: {
-        name: 'Тесты',
-        short_name: 'Тесты',
-        start_url: '/',
-        display: 'standalone',
-        background_color: '#ffffff',
-        theme_color: '#0d6efd',
-        icons: [
-          { src: 'icons/icon-192.png', sizes: '192x192', type: 'image/png' },
-          { src: 'icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' },
-        ],
-      },
-      workbox: {
-        runtimeCaching: [
-          {
-            urlPattern: ({ url }) => url.pathname.startsWith('/tests/'),
-            handler: 'NetworkFirst',
-            options: { cacheName: 'tests-base', expiration: { maxEntries: 50 } },
-          },
-        ],
-      },
-    }),
-  ],
+  plugins: [serveTestsDir(), copyTestsToDist(), VitePWA({
+    registerType: 'autoUpdate',
+    manifest: {
+      name: 'Тесты',
+      short_name: 'Тесты',
+      start_url: '/',
+      display: 'standalone',
+      background_color: '#ffffff',
+      theme_color: '#0d6efd',
+      icons: [
+        { src: 'icons/icon-192.png', sizes: '192x192', type: 'image/png' },
+        { src: 'icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' },
+      ],
+    },
+    workbox: {
+      runtimeCaching: [
+        {
+          urlPattern: ({ url }) => url.pathname.startsWith('/tests/'),
+          handler: 'NetworkFirst',
+          options: { cacheName: 'tests-base', expiration: { maxEntries: 50 } },
+        },
+      ],
+    },
+  }), cloudflare()],
 });
