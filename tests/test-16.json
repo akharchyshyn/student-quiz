@@ -151,6 +151,56 @@
         { "id": "d", "text": "Компресійний бандаж на стегні" }
       ],
       "correct": ["c"]
+    },
+    {
+      "id": "d16", "type": "single", "text": "Що означає літера «M» у MARCH (англ. — укр.)?",
+      "options": [
+        { "id": "a", "text": "Massive hemorrhage — масивна кровотеча" },
+        { "id": "b", "text": "Movement — рух" },
+        { "id": "c", "text": "Monitoring — моніторинг" },
+        { "id": "d", "text": "Muscles — м'язи" }
+      ],
+      "correct": ["a"]
+    },
+    {
+      "id": "d17", "type": "single", "text": "Що означає літера «A» у MARCH (англ. — укр.)?",
+      "options": [
+        { "id": "a", "text": "Airway — прохідність дихальних шляхів" },
+        { "id": "b", "text": "Alert — свідомість" },
+        { "id": "c", "text": "Assessment — оцінка стану" },
+        { "id": "d", "text": "Analgesia — знеболення" }
+      ],
+      "correct": ["a"]
+    },
+    {
+      "id": "d18", "type": "single", "text": "Що означає літера «R» у MARCH (англ. — укр.)?",
+      "options": [
+        { "id": "a", "text": "Respiration — дихання" },
+        { "id": "b", "text": "Response — реакція" },
+        { "id": "c", "text": "Recovery — відновлення" },
+        { "id": "d", "text": "Rescue — порятунок" }
+      ],
+      "correct": ["a"]
+    },
+    {
+      "id": "d19", "type": "single", "text": "Що означає літера «C» у MARCH (англ. — укр.)?",
+      "options": [
+        { "id": "a", "text": "Circulation — кровообіг" },
+        { "id": "b", "text": "Consciousness — свідомість" },
+        { "id": "c", "text": "Compression — компресія" },
+        { "id": "d", "text": "Contact — контакт" }
+      ],
+      "correct": ["a"]
+    },
+    {
+      "id": "d20", "type": "single", "text": "Що означає літера «H» у MARCH (англ. — укр.)?",
+      "options": [
+        { "id": "a", "text": "Hypothermia — гіпотермія (переохолодження)" },
+        { "id": "b", "text": "Hemorrhage — кровотеча" },
+        { "id": "c", "text": "Head — голова" },
+        { "id": "d", "text": "Hydration — гідратація" }
+      ],
+      "correct": ["a"]
     }
   ]
 }
